@@ -523,6 +523,9 @@ function placeholder() {
   return soon;
 }
 
+/* A listing with a Stripe Payment Link in "pay" gets a Buy now button that opens Stripe's checkout. */
+function payUrl(p) { return typeof p.pay === "string" && /^https:\/\/buy\.stripe\.com\/[A-Za-z0-9_\-\/?=&%.]+$/.test(p.pay) ? p.pay : ""; }
+
 var grid = document.getElementById("shop-grid");
 var shopList = [], shopCat = "";
 function renderShop(all) {
@@ -535,7 +538,8 @@ function renderShop(all) {
   }
   list.forEach(function (p) {
     var name = str(p.name, 60) || "Untitled print";
-    var cta = str(p.cta, 16) || "Order";
+    var pay = payUrl(p);
+    var cta = str(p.cta, 16) || (pay ? "Buy now" : "Order");
     var card = el("article", "card");
     var photo = el("div", "photo");
     photo.style.setProperty("--tint", safeTint(p.tint));
@@ -555,9 +559,10 @@ function renderShop(all) {
     body.appendChild(el("p", "", str(p.blurb, 200)));
     var foot = el("div", "card-foot");
     foot.appendChild(el("span", "price", str(p.price, 24) || "Message for price"));
-    var order = el("a", "btn ghost small", cta);
-    order.href = INSTAGRAM;
-    order.setAttribute("aria-label", cta + ": " + name + " on Instagram");
+    var order = el("a", pay ? "btn primary small" : "btn ghost small", cta);
+    order.href = pay || INSTAGRAM;
+    if (pay) { order.target = "_blank"; order.rel = "noopener"; }
+    order.setAttribute("aria-label", cta + ": " + name + (pay ? ", secure checkout with Stripe" : " on Instagram"));
     foot.appendChild(order);
     body.appendChild(foot);
     card.appendChild(photo);
