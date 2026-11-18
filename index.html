@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BuildBot Kids</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a clean studio page. White ground, thin lines, tight modern type,
+   pink and aqua used as accents, and a sliced-model print preview in the hero. */
+:root {
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --soft: #F5FAFB;
+  --ink: #0F3A4D;
+  --muted: #557585;
+  --line: #DCE9ED;
+  --pink: #E8508F;
+  --accent: #D93C7E;
+  --on-accent: #FFFFFF;
+  --aqua: #18A9C4;
+  --blue: #0C7A91;
+  --pink-soft: #FDEAF1;
+  --aqua-soft: #E4F6F9;
+  --plate: #0F3A4D;
+  --bot: #1FA971;
+  --font-display: "Outfit", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --shadow: 0 1px 2px rgba(15, 58, 77, .06), 0 12px 32px -12px rgba(15, 58, 77, .18);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(44rem 24rem at -6% -8%, var(--pink-soft), transparent 60%),
+    radial-gradient(44rem 26rem at 106% -4%, var(--aqua-soft), transparent 60%);
+  background-repeat: no-repeat;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+}
+img, svg { max-width: 100%; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
+[hidden] { display: none !important; }
+
+.wrap { width: min(1120px, 100% - 40px); margin-inline: auto; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.1; margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
+h1 { font-size: clamp(2.4rem, 5.6vw, 4.1rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.03; }
+h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); }
+h3 { font-size: 1.15rem; letter-spacing: -0.01em; }
+p { margin: 0; }
+.eyebrow {
+  font-family: var(--font-mono); font-weight: 500; font-size: 0.78rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue);
+}
+.lede { font-size: 1.12rem; color: var(--muted); max-width: 34rem; }
+
+/* Announcement belt */
+.belt { background: var(--accent); color: #FFFFFF; overflow: hidden; }
+.belt-track { display: flex; width: max-content; }
+.belt-group { display: flex; flex: none; }
+.belt-group span { display: flex; align-items: center; gap: 18px; padding: 9px 9px 9px 18px; white-space: nowrap; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; }
+.belt-group span::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #FFFFFF; opacity: .7; }
+@media (prefers-reduced-motion: no-preference) {
+  .belt-track { animation: belt 36s linear infinite; }
+  .belt:hover .belt-track { animation-play-state: paused; }
+  @keyframes belt { to { transform: translateX(-50%); } }
+}
+
+/* Header */
+header.site {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; letter-spacing: -0.02em; }
+.brand b { color: var(--pink); font-weight: 700; }
+.brand svg { width: 28px; height: 28px; flex: none; }
+.links { display: flex; align-items: center; gap: 6px 26px; flex-wrap: wrap; font-weight: 500; font-size: 0.97rem; }
+.links a { text-decoration: none; padding: 6px 0; color: var(--muted); }
+.links a:hover { color: var(--ink); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-weight: 600; font-size: 1rem;
+  padding: 12px 22px; border-radius: 999px; text-decoration: none;
+  border: 1px solid transparent; cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, transform .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn.primary, .links a.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { background: #C22F6D; }
+.btn.ghost { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--ink); }
+.btn.small { padding: 8px 16px; font-size: 0.92rem; }
+
+/* Hero */
+.hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; padding: 64px 0 56px; }
+.hero-copy { display: grid; gap: 22px; justify-items: start; }
+.hero h1 em { font-style: normal; color: var(--pink); }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+
+.printer { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 18px; box-shadow: var(--shadow); }
+.printer-head { display: flex; justify-content: space-between; gap: 12px; font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.printer svg { display: block; width: 100%; height: auto; }
+.layer { fill: var(--bot); transition: fill .25s ease; }
+.door rect { fill: #FFFFFF; opacity: .94; }
+.door text { font-family: var(--font-mono); font-size: 10px; font-weight: 500; fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
+.swatch-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid var(--line); }
+.swatch-row > span { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-right: 6px; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 0; background: var(--c); cursor: pointer; padding: 0; }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--ink); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .layer { animation: lay .35s ease-out both; }
+  @keyframes lay { from { opacity: 0; transform: translateY(-6px); } }
+  .star { animation: lay .4s ease-out 1.5s both; }
+  .door { animation: lay .3s ease-out both; }
+  .nozzle { animation: sweep 2.4s ease-in-out infinite alternate; }
+  @keyframes sweep { from { transform: translateX(-46px); } to { transform: translateX(46px); } }
+}
+
+/* Keyword strip */
+.tape { border-block: 1px solid var(--line); background: color-mix(in srgb, var(--soft) 70%, transparent); }
+.tape ul { list-style: none; margin: 0; padding: 16px 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 28px; font-family: var(--font-mono); font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
+.tape li { display: flex; align-items: center; gap: 10px; }
+.tape li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); flex: none; }
+
+/* Sections */
+section { padding: 80px 0; }
+.section-head { display: grid; gap: 12px; margin-bottom: 36px; justify-items: start; }
+
+/* Shop */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.tab { font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; padding: 8px 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.tab:hover { border-color: var(--ink); color: var(--ink); }
+.tab[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; transition: border-color .15s ease, box-shadow .15s ease; }
+.card:hover { border-color: color-mix(in srgb, var(--ink) 30%, var(--line)); box-shadow: var(--shadow); }
+.photo { aspect-ratio: 1 / 1; display: grid; place-items: center; text-align: center; background: color-mix(in srgb, var(--tint) 12%, var(--surface)); border-bottom: 1px solid var(--line); }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo .soon { display: grid; gap: 10px; justify-items: center; font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 12px; }
+.photo .soon svg { width: 40px; height: 40px; color: color-mix(in srgb, var(--tint) 70%, var(--ink)); }
+.card-body { padding: 16px 18px 18px; display: grid; gap: 6px; flex: 1; align-content: start; }
+.card-body p { color: var(--muted); font-size: 0.95rem; }
+.card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.price { font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+.note { margin-top: 22px; color: var(--muted); font-size: 0.95rem; }
+.empty { grid-column: 1 / -1; color: var(--muted); padding: 24px; border: 1px dashed var(--line); border-radius: 16px; text-align: center; }
+
+/* Steps */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; counter-reset: step; list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+.steps li { counter-increment: step; padding: 26px 28px 8px 0; display: grid; gap: 10px; align-content: start; }
+.steps li + li { padding-left: 28px; border-left: 1px solid var(--line); }
+.steps li::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.08em; color: var(--pink); }
+.steps p { color: var(--muted); }
+
+/* Custom */
+.custom { background: var(--plate); color: #FFFFFF; border-radius: 24px; padding: clamp(28px, 5vw, 56px); display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 36px; align-items: center; }
+.custom .eyebrow { color: #F7A6C6; }
+.custom p { color: #C5DCE5; max-width: 32rem; }
+.custom-copy { display: grid; gap: 16px; justify-items: start; }
+.ideas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.ideas li { font-size: 0.92rem; font-weight: 500; padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .28); color: #FFFFFF; }
+
+/* About + contact */
+.about { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.about-copy { display: grid; gap: 16px; }
+.about-copy p { color: var(--muted); max-width: 34rem; }
+.contact-card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: grid; gap: 14px; justify-items: start; box-shadow: var(--shadow); }
+.handle { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; font-size: clamp(1.5rem, 4vw, 2rem); overflow-wrap: anywhere; }
+.contact-card p { color: var(--muted); }
+
+footer { border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--muted); font-size: 0.92rem; }
+footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* Christmas popup */
+.pop-backdrop { position: fixed; inset: 0; z-index: 60; background: rgba(15, 58, 77, 0.5); display: grid; place-items: center; padding: 20px; }
+.pop { position: relative; width: min(440px, 100%); background: var(--surface); border-radius: 22px; padding: 34px 28px 28px; display: grid; gap: 14px; justify-items: center; text-align: center; box-shadow: 0 30px 70px -20px rgba(15, 58, 77, .5); border-top: 6px solid var(--accent); }
+.pop svg { width: 84px; height: 96px; }
+.pop h2 { font-size: clamp(1.5rem, 5vw, 1.9rem); }
+.pop p { color: var(--muted); }
+.pop .eyebrow { color: var(--accent); }
+.pop-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+.pop-x { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 1.2rem; line-height: 1; cursor: pointer; }
+.pop-x:hover { border-color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .pop { animation: pop .3s ease-out both; }
+  @keyframes pop { from { opacity: 0; transform: translateY(12px) scale(.97); } }
+}
+
+/* Control panel (shown only to people who can edit) */
+.panel-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(15, 58, 77, 0.45); display: flex; justify-content: flex-end; }
+.panel { width: min(460px, 100%); height: 100%; overflow-y: auto; background: var(--surface); border-left: 1px solid var(--line); padding: 22px 20px 40px; display: grid; gap: 18px; align-content: start; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.panel-head h2 { font-size: 1.5rem; }
+.panel-note { color: var(--muted); font-size: 0.95rem; }
+.panel-form { display: grid; gap: 12px; background: var(--soft); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+.field { display: grid; gap: 4px; font-weight: 600; font-size: 0.92rem; }
+.field input, .field textarea, .field select { font: inherit; font-weight: 400; color: var(--ink); background: #fff; border: 1px solid #B9CFD7; border-radius: 10px; padding: 9px 11px; width: 100%; }
+.field textarea { resize: vertical; min-height: 64px; }
+.field small { font-weight: 400; color: var(--muted); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.status { font-size: 0.95rem; min-height: 1.4em; color: var(--ink); font-weight: 600; }
+.status.bad { color: #B3261E; }
+.panel-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.panel-list li { display: grid; grid-template-columns: 56px 1fr; gap: 10px 12px; align-items: center; border: 1px solid var(--line); border-radius: 14px; padding: 10px; }
+.thumb { width: 56px; height: 56px; border-radius: 10px; border: 1px solid var(--line); object-fit: cover; display: block; }
+div.thumb { background: color-mix(in srgb, var(--tint) 30%, #fff); }
+.panel-list .pname { font-family: var(--font-display); font-weight: 600; overflow-wrap: anywhere; }
+.panel-list .pmeta { color: var(--muted); font-size: 0.9rem; }
+.row-actions { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.mini { font: inherit; font-weight: 600; font-size: 0.88rem; padding: 6px 12px; border-radius: 999px; border: 1px solid #B9CFD7; background: #fff; color: var(--ink); cursor: pointer; }
+.mini:hover { border-color: var(--ink); }
+.mini:disabled { opacity: .4; cursor: default; }
+.mini.danger { border-color: #B3261E; color: #B3261E; }
+.mini.danger.armed { background: #B3261E; color: #fff; }
+
+@media (max-width: 820px) {
+  .hero, .custom, .about { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  .steps li, .steps li + li { padding: 22px 0 6px; border-left: 0; }
+  .steps li + li { border-top: 1px solid var(--line); }
+  .hero { padding-top: 40px; }
+  section { padding: 56px 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="belt" role="note" aria-label="Christmas items coming soon. Grab them before they're gone.">
+  <div class="belt-track" aria-hidden="true"><div class="belt-group"><span>Christmas items coming soon</span><span>Grab them before they're gone</span><span>Christmas items coming soon</span><span>Grab them before they're gone</span><span>Christmas items coming soon</span><span>Grab them before they're gone</span><span>Christmas items coming soon</span><span>Grab them before they're gone</span></div><div class="belt-group"><span>Christmas items coming soon</span><span>Grab them before they're gone</span><span>Christmas items coming soon</span><span>Grab them before they're gone</span><span>Christmas items coming soon</span><span>Grab them before they're gone</span><span>Christmas items coming soon</span><span>Grab them before they're gone</span></div></div>
+</div>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="BuildBot Kids home">
+      <svg viewBox="0 0 28 28" aria-hidden="true">
+        <rect x="7" y="4" width="14" height="5" rx="2.5" fill="#E8508F"/>
+        <rect x="3" y="11.5" width="22" height="5" rx="2.5" fill="#18A9C4"/>
+        <rect x="5" y="19" width="18" height="5" rx="2.5" fill="#0F3A4D"/>
+      </svg>
+      <span>Build<b>Bot</b> Kids</span>
+    </a>
+    <nav class="links" aria-label="Main">
+      <a href="#shop">Shop</a>
+      <a href="#how">How it works</a>
+      <a href="#custom">Custom prints</a>
+      <a href="#contact">Contact</a>
+      <a class="btn primary small" href="https://www.instagram.com/buildbotkids/">Instagram</a>
+      <button class="btn ghost small" id="open-panel" type="button" hidden>Control panel</button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <div class="hero-copy">
+      <p class="eyebrow">3D Printing · Est. 2026</p>
+      <h1>Turning imagination into <em>real objects!</em></h1>
+      <p class="lede">BuildBot Kids is all about 3D printing, creativity, design and STEM. Pick a print, choose your color, and we'll make it for you.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#shop">See the prints</a>
+        <a class="btn ghost" href="#custom">Ask for a custom print</a>
+      </div>
+    </div>
+
+    <div class="printer">
+      <div class="printer-head"><span>Now printing: Advent calendar</span><span id="layer-count">Layers</span></div>
+      <svg id="slice" viewBox="0 0 360 300" role="img" aria-label="A house-shaped Christmas Advent calendar with 24 numbered doors, shown as stacked 3D printed layers with a star on top">
+        <g id="slice-layers"></g>
+        <g id="slice-doors"></g>
+        <path class="star" transform="translate(0 5)" d="M180 31l3.2 6.9 7.5.9-5.5 5.2 1.4 7.5-6.6-3.7-6.6 3.7 1.4-7.5-5.5-5.2 7.5-.9z" fill="#FFC93C" stroke="#E0A800" stroke-width="1" stroke-linejoin="round"/>
+        <g class="nozzle">
+          <rect x="172" y="6" width="16" height="16" rx="3" fill="#0F3A4D"/>
+          <path d="M175 22h10l-3 8h-4z" fill="#E8508F"/>
+        </g>
+        <rect x="40" y="268" width="280" height="3" rx="1.5" fill="#0F3A4D"/>
+        <g fill="#B9CFD7">
+          <circle cx="60" cy="284" r="1.5"/><circle cx="100" cy="284" r="1.5"/><circle cx="140" cy="284" r="1.5"/><circle cx="180" cy="284" r="1.5"/><circle cx="220" cy="284" r="1.5"/><circle cx="260" cy="284" r="1.5"/><circle cx="300" cy="284" r="1.5"/>
+        </g>
+      </svg>
+      <div class="swatch-row" role="group" aria-label="Try a filament color">
+        <span>Filament</span>
+        <button class="swatch" type="button" id="sw-green" style="--c:#1FA971" data-color="#1FA971" aria-pressed="true" aria-label="Green"></button>
+        <button class="swatch" type="button" id="sw-aqua" style="--c:#18A9C4" data-color="#18A9C4" aria-pressed="false" aria-label="Aqua"></button>
+        <button class="swatch" type="button" id="sw-pink" style="--c:#E8508F" data-color="#E8508F" aria-pressed="false" aria-label="Pink"></button>
+        <button class="swatch" type="button" id="sw-mint" style="--c:#3CCFC0" data-color="#3CCFC0" aria-pressed="false" aria-label="Mint"></button>
+        <button class="swatch" type="button" id="sw-yellow" style="--c:#FFC93C" data-color="#FFC93C" aria-pressed="false" aria-label="Yellow"></button>
+        <button class="swatch" type="button" id="sw-lilac" style="--c:#B79CF2" data-color="#B79CF2" aria-pressed="false" aria-label="Lilac"></button>
+        <button class="swatch" type="button" id="sw-lime" style="--c:#9BD62E" data-color="#9BD62E" aria-pressed="false" aria-label="Lime"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tape">
+    <div class="wrap">
+      <ul>
+        <li style="--dot:#E8508F">3D Printing</li>
+        <li style="--dot:#18A9C4">Creativity</li>
+        <li style="--dot:#E8508F">Design</li>
+        <li style="--dot:#18A9C4">STEM</li>
+      </ul>
+    </div>
+  </div>
+
+  <section id="shop">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">What we make</p>
+        <h2>Fresh off the printer</h2>
+        <p class="lede">Tap anything to order it through Instagram. Tell us the color you want and we'll take it from there.</p>
+      </div>
+      <div class="tabs" id="shop-tabs" role="group" aria-label="Filter the shop">
+        <button class="tab" type="button" id="tab-all" data-cat="" aria-pressed="true">All</button>
+        <button class="tab" type="button" id="tab-christmas" data-cat="Christmas" aria-pressed="false">Christmas</button>
+        <button class="tab" type="button" id="tab-halloween" data-cat="Halloween" aria-pressed="false">Halloween</button>
+        <button class="tab" type="button" id="tab-gifting" data-cat="Gifting" aria-pressed="false">Gifting</button>
+      </div>
+      <div class="shop-grid" id="shop-grid"></div>
+      <p class="note">New prints get added here as they come off the printer.</p>
+    </div>
+  </section>
+
+  <section id="how" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">How it works</p>
+        <h2>From idea to toy in three steps</h2>
+      </div>
+      <ol class="steps">
+        <li style="--tint:#FFC93C">
+          <h3>Pick a print</h3>
+          <p>Choose something from the shop, or send us your own idea.</p>
+        </li>
+        <li style="--tint:#F26BA3">
+          <h3>Choose your color</h3>
+          <p>Message us on Instagram with the print and the color you'd like.</p>
+        </li>
+        <li style="--tint:#3CCFC0">
+          <h3>We print it</h3>
+          <p>Your order is printed layer by layer, checked, and sent your way.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="custom" style="padding-top:0">
+    <div class="wrap">
+      <div class="custom">
+        <div class="custom-copy">
+          <p class="eyebrow">Custom prints</p>
+          <h2>Got an idea? We'll try to print it.</h2>
+          <p>Names, gifts, party favors, a toy nobody else has. Send us a message with what you have in mind and we'll tell you what's possible.</p>
+          <a class="btn primary" href="https://www.instagram.com/buildbotkids/">Message us on Instagram</a>
+        </div>
+        <ul class="ideas" aria-label="Custom print ideas">
+          <li style="--tint:#FFC93C">Name signs</li>
+          <li style="--tint:#F9A8C9">Keychains</li>
+          <li style="--tint:#3CCFC0">Fidgets</li>
+          <li style="--tint:#8FDDE8">3D puzzles</li>
+          <li style="--tint:#F9A8C9">Educational models</li>
+          <li style="--tint:#3CCFC0">Your own design</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" style="padding-top:0">
+    <div class="wrap about">
+      <div class="about-copy">
+        <p class="eyebrow">About</p>
+        <h2>Created by two kids who love to build</h2>
+        <p>BuildBot Kids was started in 2026 by two kids with a 3D printer and a lot of ideas. They design the prints, pick the colors and watch every piece come to life one layer at a time.</p>
+        <p>It's about more than toys. Every print is a small lesson in 3D printing, creativity, design and STEM, and proof that an idea on a screen can become something you can hold in your hand.</p>
+        <p>Follow along on Instagram to see what's printing this week.</p>
+      </div>
+      <div class="contact-card">
+        <p class="eyebrow">Order and contact</p>
+        <p class="handle">@buildbotkids</p>
+        <p>Orders and questions go through Instagram direct messages. Find us at instagram.com/buildbotkids.</p>
+        <a class="btn primary" href="https://www.instagram.com/buildbotkids/">Open Instagram</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 BuildBot Kids · Created by two kids</span>
+    <a href="https://www.instagram.com/buildbotkids/">instagram.com/buildbotkids</a>
+  </div>
+</footer>
+
+<div class="pop-backdrop" id="xmas-pop">
+  <div class="pop" role="dialog" aria-modal="true" aria-labelledby="xmas-title">
+    <button class="pop-x" id="xmas-x" type="button" aria-label="Close">×</button>
+    <svg viewBox="0 0 84 96" aria-hidden="true">
+      <path d="M42 2l2.6 5.6 6.1.7-4.5 4.2 1.2 6.1-5.4-3-5.4 3 1.2-6.1-4.5-4.2 6.1-.7z" fill="#FFC93C"/>
+      <g fill="#1FA971">
+        <rect x="34" y="22" width="16" height="5" rx="2.5"/><rect x="29" y="29" width="26" height="5" rx="2.5"/><rect x="24" y="36" width="36" height="5" rx="2.5"/>
+        <rect x="28" y="43" width="28" height="5" rx="2.5"/><rect x="21" y="50" width="42" height="5" rx="2.5"/><rect x="14" y="57" width="56" height="5" rx="2.5"/>
+        <rect x="20" y="64" width="44" height="5" rx="2.5"/><rect x="11" y="71" width="62" height="5" rx="2.5"/><rect x="4" y="78" width="76" height="5" rx="2.5"/>
+      </g>
+      <rect x="36" y="85" width="12" height="9" rx="2.5" fill="#7A5A44"/>
+      <circle cx="33" cy="38.5" r="3" fill="#E8508F"/><circle cx="52" cy="59.5" r="3" fill="#E8508F"/><circle cx="26" cy="73.5" r="3" fill="#18A9C4"/><circle cx="60" cy="80.5" r="3" fill="#FFC93C"/>
+    </svg>
+    <p class="eyebrow">Christmas 2026</p>
+    <h2 id="xmas-title">Christmas items coming soon</h2>
+    <p>3D printed Christmas items and an Advent calendar are on the way. Grab them before they're gone.</p>
+    <div class="pop-actions">
+      <a class="btn primary" href="https://www.instagram.com/buildbotkids/">Follow on Instagram</a>
+      <button class="btn ghost" id="xmas-close" type="button">Keep browsing</button>
+    </div>
+  </div>
+</div>
+
+<div class="panel-backdrop" id="panel" hidden>
+  <aside class="panel" role="dialog" aria-modal="true" aria-labelledby="panel-title">
+    <div class="panel-head">
+      <h2 id="panel-title">Control panel</h2>
+      <button class="btn ghost small" id="close-panel" type="button">Close</button>
+    </div>
+    <p class="panel-note">Only you and people you make editors can see this panel. Changes show up in the shop right away.</p>
+
+    <form class="panel-form" id="product-form">
+      <h3 id="form-title">Add a print</h3>
+      <label class="field" for="pf-name">Name
+        <input id="pf-name" type="text" maxlength="60" required placeholder="Custom Keychains">
+      </label>
+      <label class="field" for="pf-blurb">Description
+        <textarea id="pf-blurb" maxlength="200" placeholder="One short sentence about it."></textarea>
+      </label>
+      <div class="two">
+        <label class="field" for="pf-price">Price
+          <input id="pf-price" type="text" maxlength="24" placeholder="$5">
+        </label>
+        <label class="field" for="pf-cta">Button text
+          <input id="pf-cta" type="text" maxlength="16" placeholder="Order">
+        </label>
+      </div>
+      <label class="field" for="pf-cat">Category
+        <select id="pf-cat">
+          <option value="">None (shows under All only)</option>
+          <option value="Christmas">Christmas</option>
+          <option value="Halloween">Halloween</option>
+          <option value="Gifting">Gifting</option>
+        </select>
+      </label>
+      <label class="field" for="pf-tint">Card color
+        <select id="pf-tint">
+          <option value="#E8508F">Pink</option>
+          <option value="#18A9C4">Aqua</option>
+          <option value="#3CCFC0">Mint</option>
+          <option value="#FFC93C">Yellow</option>
+          <option value="#B79CF2">Lilac</option>
+        </select>
+      </label>
+      <label class="field" for="pf-photo">Photo
+        <input id="pf-photo" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+        <small id="pf-photo-hint">JPG or PNG. Square photos look best.</small>
+      </label>
+      <div class="form-actions">
+        <button class="btn primary small" type="submit" id="pf-save">Add print</button>
+        <button class="btn ghost small" type="button" id="pf-cancel" hidden>Cancel edit</button>
+      </div>
+      <p class="status" id="pf-status" role="status"></p>
+    </form>
+
+    <h3>Prints in the shop</h3>
+    <ul class="panel-list" id="panel-list"></ul>
+  </aside>
+</div>
+
+<script>
+/* ---------------------------------------------------------------
+   The shop list is saved in the page's database and edited from the
+   Control panel (visible to people who can edit this page).
+   DEFAULTS is what visitors see when the saved list can't be loaded.
+---------------------------------------------------------------- */
+var DEFAULTS = [
+  { name: "Christmas Prints", blurb: "3D printed Christmas items for the tree, the table and the stocking.", price: "Coming soon", tint: "#1FA971", cta: "Ask us", category: "Christmas" },
+  { name: "Advent Calendar", blurb: "A 3D printed Advent calendar to count down to Christmas.", price: "Coming soon", tint: "#E8508F", cta: "Ask us", category: "Christmas" },
+  { name: "Custom Keychains", blurb: "Your name, a shape or a little charm, printed in your color.", price: "", tint: "#E8508F", category: "Gifting" },
+  { name: "3D Puzzles", blurb: "Printed pieces that click together.", price: "", tint: "#18A9C4" },
+  { name: "Fidgets & Toys", blurb: "Wiggly, clicky toys that come off the printer ready to play.", price: "", tint: "#E8508F" },
+  { name: "Educational Models", blurb: "Models you can hold, made for learning and school projects.", price: "", tint: "#18A9C4" },
+  { name: "Live Design Demo", blurb: "Watch a design go from the screen to a real object.", price: "", tint: "#E8508F", cta: "Ask us" }
+];
+var INSTAGRAM = "https://www.instagram.com/buildbotkids/";
+
+function el(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text) n.textContent = text;
+  return n;
+}
+function str(v, max) { return (typeof v === "string" ? v : "").slice(0, max); }
+function safeTint(t) { return /^#[0-9A-Fa-f]{6}$/.test(t || "") ? t : "#E8508F"; }
+function photoUrl(p) {
+  if (typeof p.photo === "string" && /^[A-Za-z0-9_-]{8,64}$/.test(p.photo)) return "/_blob/" + p.photo;
+  if (typeof p.img === "string" && /^images\/[A-Za-z0-9_.-]+$/.test(p.img)) return p.img;
+  return "";
+}
+
+function placeholder() {
+  var soon = el("div", "soon");
+  soon.innerHTML = '<svg viewBox="0 0 54 54" aria-hidden="true"><rect x="6" y="6" width="42" height="6" rx="3" fill="currentColor"/><rect x="8" y="10" width="5" height="34" rx="2.5" fill="currentColor"/><rect x="41" y="10" width="5" height="34" rx="2.5" fill="currentColor"/><path d="M22 12h10v8l-5 7-5-7z" fill="currentColor"/><rect x="4" y="42" width="46" height="6" rx="3" fill="currentColor"/></svg>';
+  soon.appendChild(el("span", "", "Photo coming soon"));
+  return soon;
+}
+
+var grid = document.getElementById("shop-grid");
+var shopList = [], shopCat = "";
+function renderShop(all) {
+  if (all) shopList = all;
+  var list = shopCat ? shopList.filter(function (p) { return p.category === shopCat; }) : shopList;
+  grid.textContent = "";
+  if (!list.length) {
+    grid.appendChild(el("p", "empty", shopCat ? shopCat + " prints are coming soon. Check back or follow us on Instagram." : "New prints are on the way. Check back soon."));
+    return;
+  }
+  list.forEach(function (p) {
+    var name = str(p.name, 60) || "Untitled print";
+    var cta = str(p.cta, 16) || "Order";
+    var card = el("article", "card");
+    var photo = el("div", "photo");
+    photo.style.setProperty("--tint", safeTint(p.tint));
+    var url = photoUrl(p);
+    if (url) {
+      var img = el("img");
+      img.alt = name;
+      img.loading = "lazy";
+      img.addEventListener("error", function () { photo.textContent = ""; photo.appendChild(placeholder()); });
+      img.src = url;
+      photo.appendChild(img);
+    } else {
+      photo.appendChild(placeholder());
+    }
+    var body = el("div", "card-body");
+    body.appendChild(el("h3", "", name));
+    body.appendChild(el("p", "", str(p.blurb, 200)));
+    var foot = el("div", "card-foot");
+    foot.appendChild(el("span", "price", str(p.price, 24) || "Message for price"));
+    var order = el("a", "btn ghost small", cta);
+    order.href = INSTAGRAM;
+    order.setAttribute("aria-label", cta + ": " + name + " on Instagram");
+    foot.appendChild(order);
+    body.appendChild(foot);
+    card.appendChild(photo);
+    card.appendChild(body);
+    grid.appendChild(card);
+  });
+}
+renderShop(DEFAULTS);
+var tabs = document.querySelectorAll(".tab");
+tabs.forEach(function (t) {
+  t.addEventListener("click", function () {
+    shopCat = t.dataset.cat;
+    tabs.forEach(function (o) { o.setAttribute("aria-pressed", o === t ? "true" : "false"); });
+    renderShop();
+  });
+});
+
+/* Hero: draw an Advent calendar as printed layers, bottom to top, then its 24 doors. */
+(function () {
+  var g = document.getElementById("slice-layers");
+  var doors = document.getElementById("slice-doors");
+  var NS = "http://www.w3.org/2000/svg", BODY = 22, ROOF = 11, N = BODY + ROOF, H = 5, GAP = 1.2, STEP = H + GAP, BASE = 262;
+  for (var i = 0; i < N; i++) {
+    var w = 100;
+    if (i >= BODY) w = 110 - 100 * ((i - BODY) / (ROOF - 1));
+    var r = document.createElementNS(NS, "rect");
+    r.setAttribute("class", "layer");
+    r.setAttribute("x", (180 - w).toFixed(1));
+    r.setAttribute("y", (BASE - (i + 1) * STEP).toFixed(1));
+    r.setAttribute("width", (2 * w).toFixed(1));
+    r.setAttribute("height", H);
+    r.setAttribute("rx", 2.5);
+    r.setAttribute("opacity", i % 2 ? 0.78 : 1);
+    r.style.animationDelay = (i * 45) + "ms";
+    g.appendChild(r);
+  }
+  var COLS = 6, ROWS = 4, left = 88, top = BASE - BODY * STEP + 6, cw = 184 / COLS, ch = (BODY * STEP - 12) / ROWS, size = 23;
+  for (var n = 0; n < COLS * ROWS; n++) {
+    var cx = left + (n % COLS + 0.5) * cw, cy = top + (Math.floor(n / COLS) + 0.5) * ch;
+    var d = document.createElementNS(NS, "g");
+    d.setAttribute("class", "door");
+    d.style.animationDelay = (N * 45 + n * 35) + "ms";
+    var box = document.createElementNS(NS, "rect");
+    box.setAttribute("x", (cx - size / 2).toFixed(1));
+    box.setAttribute("y", (cy - size / 2).toFixed(1));
+    box.setAttribute("width", size);
+    box.setAttribute("height", size);
+    box.setAttribute("rx", 4);
+    var num = document.createElementNS(NS, "text");
+    num.setAttribute("x", cx.toFixed(1));
+    num.setAttribute("y", (cy + 0.5).toFixed(1));
+    num.textContent = n + 1;
+    d.appendChild(box);
+    d.appendChild(num);
+    doors.appendChild(d);
+  }
+  document.getElementById("layer-count").textContent = "Layer " + N + " of " + N;
+})();
+
+/* Christmas popup: shown each time the site opens. */
+(function () {
+  var pop = document.getElementById("xmas-pop");
+  function close() { pop.hidden = true; document.removeEventListener("keydown", onKey); }
+  function onKey(e) { if (e.key === "Escape") close(); }
+  document.getElementById("xmas-x").addEventListener("click", close);
+  document.getElementById("xmas-close").addEventListener("click", close);
+  pop.addEventListener("click", function (e) { if (e.target === pop) close(); });
+  document.addEventListener("keydown", onKey);
+  try { document.getElementById("xmas-close").focus({ preventScroll: true }); } catch (e) {}
+})();
+
+var swatches = document.querySelectorAll(".swatch");
+swatches.forEach(function (s) {
+  s.addEventListener("click", function () {
+    document.documentElement.style.setProperty("--bot", s.dataset.color);
+    swatches.forEach(function (o) { o.setAttribute("aria-pressed", o === s ? "true" : "false"); });
+  });
+});
+
+/* ---------------- saved shop list + control panel ---------------- */
+(async function () {
+  if (!window.claude || typeof window.claude.use !== "function") return;
+  var db, user, assets;
+  try {
+    var got = await Promise.all([window.claude.use("db"), window.claude.use("user"), window.claude.use("assets")]);
+    db = got[0]; user = got[1]; assets = got[2];
+  } catch (e) { return; }
+  if (!db) return;
+
+  var items = [];
+  var col = db.collection("products");
+  var panelReady = false;
+
+  col.orderBy("order").onSnapshot(function (snap) {
+    if (snap.empty && snap.metadata && snap.metadata.fromCache) return;
+    items = snap.docs.map(function (d) {
+      var x = d.data() || {};
+      return { id: d.id, name: x.name, blurb: x.blurb, price: x.price, cta: x.cta, tint: x.tint, photo: x.photo, category: typeof x.category === "string" ? x.category : "", order: typeof x.order === "number" ? x.order : 0 };
+    });
+    renderShop(items);
+    if (panelReady) renderList();
+  }, function () { /* keep showing what is already on the page */ });
+
+  var canEdit = false;
+  try { canEdit = user ? !!(await user.canEdit()) : false; } catch (e) {}
+  if (!canEdit) return;
+
+  var openBtn = document.getElementById("open-panel");
+  var panel = document.getElementById("panel");
+  var closeBtn = document.getElementById("close-panel");
+  var form = document.getElementById("product-form");
+  var formTitle = document.getElementById("form-title");
+  var fName = document.getElementById("pf-name");
+  var fBlurb = document.getElementById("pf-blurb");
+  var fPrice = document.getElementById("pf-price");
+  var fCta = document.getElementById("pf-cta");
+  var fTint = document.getElementById("pf-tint");
+  var fCat = document.getElementById("pf-cat");
+  var fPhoto = document.getElementById("pf-photo");
+  var photoHint = document.getElementById("pf-photo-hint");
+  var saveBtn = document.getElementById("pf-save");
+  var cancelBtn = document.getElementById("pf-cancel");
+  var statusEl = document.getElementById("pf-status");
+  var listEl = document.getElementById("panel-list");
+  var editing = null;
+  var busy = false;
+
+  function say(msg, bad) { statusEl.textContent = msg || ""; statusEl.classList.toggle("bad", !!bad); }
+  function explain(err) {
+    var code = err && err.code;
+    if (code === "too_large") return "That photo is too big. Try a smaller one.";
+    if (code === "unsupported_type") return "That file type doesn't work. Use a JPG or PNG photo.";
+    if (code === "quota_or_state" || code === "quota_exceeded") return "Storage is full. Delete a print or photo you no longer need, then try again.";
+    if (code === "rate_limited" || code === "resource_exhausted") return "Too many changes at once. Wait a moment and try again.";
+    if (code === "invalid_argument" || code === "not_granted") return "This view can't save changes. Open the page as its owner and try again.";
+    return "That didn't save. Check your connection and try again.";
+  }
+  function setBusy(on) {
+    busy = on;
+    saveBtn.disabled = on;
+    listEl.querySelectorAll("button").forEach(function (b) { b.disabled = on || b.dataset.off === "1"; });
+  }
+
+  function openPanel() { panel.hidden = false; closeBtn.focus(); }
+  function closePanel() { panel.hidden = true; openBtn.focus(); }
+  openBtn.hidden = false;
+  openBtn.addEventListener("click", openPanel);
+  closeBtn.addEventListener("click", closePanel);
+  panel.addEventListener("click", function (e) { if (e.target === panel) closePanel(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !panel.hidden) closePanel(); });
+
+  function resetForm() {
+    editing = null;
+    form.reset();
+    formTitle.textContent = "Add a print";
+    saveBtn.textContent = "Add print";
+    cancelBtn.hidden = true;
+    photoHint.textContent = "JPG or PNG. Square photos look best.";
+  }
+  function startEdit(p) {
+    editing = p;
+    fName.value = str(p.name, 60);
+    fBlurb.value = str(p.blurb, 200);
+    fPrice.value = str(p.price, 24);
+    fCta.value = str(p.cta, 16);
+    fTint.value = safeTint(p.tint);
+    if (fTint.value !== safeTint(p.tint)) fTint.selectedIndex = 0;
+    fCat.value = p.category || "";
+    if (fCat.selectedIndex < 0) fCat.selectedIndex = 0;
+    fPhoto.value = "";
+    formTitle.textContent = "Edit: " + (str(p.name, 60) || "print");
+    saveBtn.textContent = "Save changes";
+    cancelBtn.hidden = false;
+    photoHint.textContent = photoUrl(p) ? "Leave empty to keep the current photo." : "JPG or PNG. Square photos look best.";
+    say("");
+    form.scrollIntoView({ block: "start" });
+    fName.focus();
+  }
+  cancelBtn.addEventListener("click", function () { resetForm(); say(""); });
+
+  /* Shrink big phone photos before upload so the shop loads fast. */
+  async function shrink(file) {
+    if (file.type === "image/gif") return file;
+    try {
+      var bmp = await createImageBitmap(file);
+      var scale = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+      var c = document.createElement("canvas");
+      c.width = Math.round(bmp.width * scale);
+      c.height = Math.round(bmp.height * scale);
+      var ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(bmp, 0, 0, c.width, c.height);
+      var out = await new Promise(function (res) { c.toBlob(res, "image/jpeg", 0.86); });
+      return out || file;
+    } catch (e) { return file; }
+  }
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (busy) return;
+    var name = fName.value.trim();
+    if (!name) { say("Give the print a name.", true); fName.focus(); return; }
+    var data = { name: name, blurb: fBlurb.value.trim(), price: fPrice.value.trim(), cta: fCta.value.trim(), tint: safeTint(fTint.value), category: fCat.value };
+    var file = fPhoto.files && fPhoto.files[0];
+    var wasEditing = editing;
+    setBusy(true);
+    try {
+      if (file) {
+        if (!assets) throw { code: "not_granted" };
+        say("Uploading photo…");
+        var blob = await shrink(file);
+        var up = await assets.upload(blob, { type: blob.type });
+        data.photo = up.id;
+      } else if (wasEditing && wasEditing.photo) {
+        data.photo = wasEditing.photo;
+      }
+      say("Saving…");
+      if (wasEditing) {
+        data.order = wasEditing.order;
+        await col.doc(wasEditing.id).set(data);
+        if (file && wasEditing.photo && assets) { try { await assets.delete(wasEditing.photo); } catch (e2) {} }
+      } else {
+        data.order = items.reduce(function (m, p) { return Math.max(m, p.order); }, 0) + 1;
+        await col.add(data);
+      }
+      resetForm();
+      say(wasEditing ? "Saved." : "Added to the shop.");
+    } catch (err) {
+      say(explain(err), true);
+    }
+    setBusy(false);
+  });
+
+  async function move(index, dir) {
+    var a = items[index], b = items[index + dir];
+    if (!a || !b || busy) return;
+    setBusy(true);
+    try {
+      var ao = a.order, bo = b.order;
+      if (ao === bo) bo = ao + dir;
+      await col.doc(a.id).update({ order: bo });
+      await col.doc(b.id).update({ order: ao });
+      say("");
+    } catch (err) { say(explain(err), true); }
+    setBusy(false);
+  }
+  async function remove(p) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await col.doc(p.id).delete();
+      if (p.photo && assets) { try { await assets.delete(p.photo); } catch (e2) {} }
+      if (editing && editing.id === p.id) resetForm();
+      say("Deleted.");
+    } catch (err) { say(explain(err), true); }
+    setBusy(false);
+  }
+
+  function mini(label, cls) { var b = el("button", "mini" + (cls ? " " + cls : ""), label); b.type = "button"; return b; }
+  function renderList() {
+    listEl.textContent = "";
+    if (!items.length) { listEl.appendChild(el("li", "", "")).textContent = "Nothing in the shop yet. Add your first print above."; return; }
+    items.forEach(function (p, i) {
+      var li = el("li");
+      var url = photoUrl(p), thumb;
+      if (url) { thumb = el("img", "thumb"); thumb.alt = ""; thumb.src = url; }
+      else { thumb = el("div", "thumb"); thumb.style.setProperty("--tint", safeTint(p.tint)); }
+      var text = el("div");
+      text.appendChild(el("div", "pname", str(p.name, 60) || "Untitled print"));
+      text.appendChild(el("div", "pmeta", (str(p.price, 24) || "No price") + (url ? " · has photo" : " · no photo")));
+      var row = el("div", "row-actions");
+      var up = mini("Move up"), down = mini("Move down"), edit = mini("Edit"), del = mini("Delete", "danger");
+      if (i === 0) { up.disabled = true; up.dataset.off = "1"; }
+      if (i === items.length - 1) { down.disabled = true; down.dataset.off = "1"; }
+      up.addEventListener("click", function () { move(i, -1); });
+      down.addEventListener("click", function () { move(i, 1); });
+      edit.addEventListener("click", function () { startEdit(p); });
+      del.addEventListener("click", function () {
+        if (del.classList.contains("armed")) { remove(p); return; }
+        del.classList.add("armed");
+        del.textContent = "Tap again to delete for good";
+        setTimeout(function () { del.classList.remove("armed"); del.textContent = "Delete"; }, 4000);
+      });
+      row.appendChild(up); row.appendChild(down); row.appendChild(edit); row.appendChild(del);
+      li.appendChild(thumb); li.appendChild(text); li.appendChild(row);
+      listEl.appendChild(li);
+    });
+    if (busy) setBusy(true);
+  }
+  panelReady = true;
+  renderList();
+})();
+</script>
+</body>
+</html>
