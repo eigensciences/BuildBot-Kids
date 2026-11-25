@@ -177,6 +177,14 @@ section { padding: 80px 0; }
 .ideas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .ideas li { font-size: 0.92rem; font-weight: 500; padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .28); color: #FFFFFF; }
 
+/* Print your own design + community */
+.send-list { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; color: var(--muted); }
+.send-mail { overflow-wrap: anywhere; }
+.community-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: 20px; }
+.shot { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.shot img { width: 100%; height: auto; display: block; }
+.shot figcaption { padding: 14px 18px; color: var(--muted); font-size: 0.95rem; }
+
 /* About + contact */
 .about { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .about-copy { display: grid; gap: 16px; }
@@ -256,6 +264,8 @@ div.thumb { background: color-mix(in srgb, var(--tint) 30%, #fff); }
       <a href="#shop">Shop</a>
       <a href="#how">How it works</a>
       <a href="#custom">Custom prints</a>
+      <a href="#print">Print your design</a>
+      <a href="#community">Community</a>
       <a href="#contact">Contact</a>
       <a class="btn primary small" href="https://www.instagram.com/buildbotkids/">Instagram</a>
       <button class="btn ghost small" id="open-panel" type="button" hidden>Control panel</button>
@@ -372,6 +382,44 @@ div.thumb { background: color-mix(in srgb, var(--tint) 30%, #fff); }
           <li style="--tint:#F9A8C9">Educational models</li>
           <li style="--tint:#3CCFC0">Your own design</li>
         </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="print" style="padding-top:0">
+    <div class="wrap about">
+      <div class="about-copy">
+        <p class="eyebrow">Print your own design</p>
+        <h2>Have a 3D model? We'll print it and ship it.</h2>
+        <p>Send us your STL file and tell us how big you want it. We'll reply with a price, print it, and ship it to your address.</p>
+      </div>
+      <div class="contact-card">
+        <p class="eyebrow">What to send</p>
+        <ul class="send-list">
+          <li>Your STL file, attached to the email</li>
+          <li>The size you want</li>
+          <li>Color and quantity</li>
+          <li>Your shipping address</li>
+          <li>Your email address</li>
+        </ul>
+        <a class="btn primary" href="mailto:gaurav.sharmapsit@gmail.com?subject=Print%20my%203D%20design&amp;body=Hi%20BuildBot%20Kids%2C%0A%0AI%27d%20like%20to%20have%20my%203D%20model%20printed.%20My%20STL%20file%20is%20attached.%0A%0ASize%20wanted%20%28height%20or%20longest%20side%29%3A%0AColor%3A%0AQuantity%3A%0AShipping%20address%3A%0AMy%20email%20address%3A%0ANotes%3A%0A">Email your file</a>
+        <p class="send-mail">Or write to <strong>gaurav.sharmapsit@gmail.com</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="community" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Community</p>
+        <h2>Giving back to the community</h2>
+        <p class="lede">We use our printer to say thank you to the people who look after our neighborhood.</p>
+      </div>
+      <div class="community-grid">
+        <figure class="shot">
+          <img src="images/community-1.jpg" alt="Two children standing with a soldier holding a toddler and a police officer, who are holding 3D printed thank-you gifts" loading="lazy" width="1024" height="768">
+          <figcaption>3D printed thank-you gifts for those who serve our community.</figcaption>
+        </figure>
       </div>
     </div>
   </section>
